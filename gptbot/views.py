@@ -31,6 +31,8 @@ def chatbot_api(request):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
     return JsonResponse({"error": "POST method required"}, status=405)
+
+
 @csrf_exempt
 def chat_page(request):
     return render(request, "chat.html")
