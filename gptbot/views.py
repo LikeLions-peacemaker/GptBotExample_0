@@ -16,14 +16,18 @@ def chatbot_api(request):
             if not user_input:
                 return JsonResponse({"error": "No input"}, status=400)
             
-            # 대화 기록에 추가
             conversation_history.append({"role": "user", "content": user_input})
+            full_answer = answer_question(user_input, conversation_history)
+            conversation_history.append({"role": "assistant", "content": full_answer})
 
-            # 답변 생성
-            answer = answer_question(user_input, conversation_history)
-            conversation_history.append({"role": "assistant", "content": answer})
+            # JSON 파싱 시도
+            try:
+                parsed = json.loads(full_answer)
+                only_response = parsed.get("response", "no response")
+            except json.JSONDecodeError:
+                only_response = "응답 형식이 올바르지 않습니다."
 
-            return JsonResponse({"answer": answer})
+            return JsonResponse({"answer": only_response})
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
     return JsonResponse({"error": "POST method required"}, status=405)
